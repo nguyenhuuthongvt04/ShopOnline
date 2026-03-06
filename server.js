@@ -1,6 +1,6 @@
 const path = require("path");
 const express = require('express');
-const sql = require('mssql');
+const sql = require('./db');
 const cors = require("cors");
 
  const app = express();
