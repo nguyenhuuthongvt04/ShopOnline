@@ -1,6 +1,13 @@
-// Load environment variables from api.env (for local development)
-// install dotenv (`npm install dotenv`) and ensure api.env is in .gitignore
-require('dotenv').config({ path: './api.env' });
+// Load environment variables from api.env during development only
+// dotenv is not required in production (render/Heroku etc provide env vars)
+// install with `npm install dotenv` and add api.env to .gitignore
+if (process.env.NODE_ENV !== 'production') {
+    try {
+        require('dotenv').config({ path: './api.env' });
+    } catch (e) {
+        console.warn('dotenv not installed, skipping');
+    }
+}
 
 const path = require("path");
 const express = require('express');
@@ -21,6 +28,17 @@ app.get('/products', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).send('Database error');
+    }
+});
+
+// simple health check to verify DB connection
+app.get('/ping', async (req, res) => {
+    try {
+        await sql`SELECT 1`;
+        res.send('pong');
+    } catch (err) {
+        console.error('DB ping failed', err);
+        res.status(500).send('db down');
     }
 });
 
