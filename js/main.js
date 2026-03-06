@@ -128,29 +128,27 @@ function handleCheckout(e) {
     };
 
 
-    // Dánlink google script ở đâyyy
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYR9duY3GOxEOHvkbEW2veEwDkEkGcKmaBI3p7NNCtkQYVgTjX0yPTbYx3tu-Jf0aa5A/exec"; 
-
-   
-    fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors", 
-        headers: { "Content-Type": "application/json" },
+    // send order to our own backend (/orders)
+    fetch('/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dataToSend)
     })
-    .then(() => {
-     
+    .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+    })
+    .then(savedOrder => {
         const yourZaloPhone = '84397768941'; // Số của bạn
         let msg = `DON HANG MOI!\nKhach: ${name}\nSDT: ${phone}\nTong: ${formatCurrency(totalMoney)}\nChi tiet: ${productNames}`;
         const zaloUrl = `https://zalo.me/${yourZaloPhone}?text=${encodeURIComponent(msg)}`;
-        
-    
+
         localStorage.removeItem(CART_KEY);
         
-        if(confirm('Đã gửi đơn hàng thành công! Bấm OK để báo qua Zalo.')) {
+        if (confirm('Đã gửi đơn hàng thành công! Bấm OK để báo qua Zalo.')) {
             window.location.href = zaloUrl;
         } else {
-             window.location.href = 'index.html';
+            window.location.href = 'index.html';
         }
     })
     .catch(error => {

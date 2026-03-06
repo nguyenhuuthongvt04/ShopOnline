@@ -5,12 +5,22 @@ function formatCurrency(amount) {
 }
 
 
-function renderOrders() {
+async function renderOrders() {
     const tableBody = document.querySelector('#orders-table tbody');
     const noOrdersMsg = document.getElementById('no-orders');
-    
 
-    let orders = JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
+    // fetch from backend instead of localStorage
+    let orders = [];
+    try {
+        const resp = await fetch('/orders');
+        if (resp.ok) {
+            orders = await resp.json();
+        } else {
+            console.error('failed to load orders');
+        }
+    } catch (e) {
+        console.error('fetch error', e);
+    }
 
     if (orders.length === 0) {
         if(noOrdersMsg) noOrdersMsg.style.display = 'block';
@@ -58,18 +68,13 @@ function renderOrders() {
 }
 
 
-function deleteOrder(orderId) {
+async function deleteOrder(orderId) {
     if (confirm('Bạn chắc chắn muốn xóa đơn hàng này? (Hành động này không thể hoàn tác)')) {
-
-        let orders = JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
-        
-    
-        let newOrders = orders.filter(order => order.id !== orderId);
-        
-      
-        localStorage.setItem(ORDERS_KEY, JSON.stringify(newOrders));
-        
-     
+        try {
+            await fetch(`/orders/${orderId}`, { method: 'DELETE' });
+        } catch (e) {
+            console.error('delete request failed', e);
+        }
         renderOrders();
     }
 }

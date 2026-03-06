@@ -19,6 +19,9 @@ app.use(cors());
 
 app.use(express.static(path.join(__dirname)));
 
+// parse JSON request bodies
+app.use(express.json());
+
 // No need for config here, db.js handles connection via DATABASE_URL
 
 app.get('/products', async (req, res) => {
@@ -27,6 +30,43 @@ app.get('/products', async (req, res) => {
         res.json(result);
     } catch (err) {
         console.error(err);
+        res.status(500).send('Database error');
+    }
+});
+
+// orders endpoints
+app.post('/orders', async (req, res) => {
+    const { date, name, phone, address, items, total } = req.body;
+    try {
+        const inserted = await sql`
+            INSERT INTO Orders (date, name, phone, address, items, total)
+            VALUES (${date}, ${name}, ${phone}, ${address}, ${items}, ${total})
+            RETURNING *
+        `;
+        res.json(inserted[0]);
+    } catch (err) {
+        console.error('order insert failed', err);
+        res.status(500).send('Could not save order');
+    }
+});
+
+app.get('/orders', async (req, res) => {
+    try {
+        const rows = await sql`SELECT * FROM Orders ORDER BY id DESC`;
+        res.json(rows);
+    } catch (err) {
+        console.error('fetch orders failed', err);
+        res.status(500).send('Database error');
+    }
+});
+
+app.delete('/orders/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        await sql`DELETE FROM Orders WHERE id = ${id}`;
+        res.sendStatus(204);
+    } catch (err) {
+        console.error('delete order failed', err);
         res.status(500).send('Database error');
     }
 });
@@ -41,6 +81,24 @@ app.get('/ping', async (req, res) => {
         res.status(500).send('db down');
     }
 });
+
+// ensure orders table exists (run once at startup)
+(async () => {
+    try {
+        await sql`CREATE TABLE IF NOT EXISTS Orders (
+            id serial PRIMARY KEY,
+            date text,
+            name text,
+            phone text,
+            address text,
+            items text,
+            total text
+        )`;
+        console.log('Orders table checked/created');
+    } catch (e) {
+        console.error('failed to create Orders table', e);
+    }
+})();
 
 const PORT = process.env.PORT || 3000;
 
