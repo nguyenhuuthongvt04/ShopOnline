@@ -3,7 +3,7 @@
     --primary-color: #444f4a; /* màu chính */
     --primary-dark: #474e4a; /* màu chính đậm */
     --text-color: #2d2b2b;     /* màu chữ chính */
-    --bg-light: #f8f9fa;    /* màu nền sáng */
+    --bg-light: #ffffff;    /* màu nền sáng */
     --white: #ffffff;       /* màu trắng */
     --shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* bóng đổ */
     --radius: 12px;         /* bo góc */
@@ -309,7 +309,7 @@ footer {
     }
 }
 
-/* Modal for image preview with product info */
+
 .modal {
     display: none;
     position: fixed;
@@ -323,14 +323,14 @@ footer {
     background: var(--white);
     padding: 20px;
     border-radius: 12px;
-    /* make modal smaller so image isn't huge */    
-    max-width: 50%;
+/*kich thước */
+    max-width: 50%; 
     max-height: 70%;
     overflow: auto;
     text-align: center;
 }
 .modal-content img {
-    /* limit image within smaller modal */
+    
     max-width: 80%;
     height: auto;
     margin-bottom: 15px;
@@ -340,9 +340,9 @@ footer {
     color: #555;
     margin-top: 8px;
     text-align: left;
-    white-space: pre-wrap; /* allow line breaks */
+    white-space: pre-wrap; 
 }
-/* Layout for info section inside modal */
+
 #modal-info {
     text-align: left;
     border-top: 1px solid #eee;
@@ -358,11 +358,10 @@ footer {
 }
 #modal-info h3 {
     margin-bottom: 10px;
-    font-size: 1.2rem;
+    font-size: 1rem;
 }
 #modal-info p {
     font-weight: bold;
     color: var(--primary-dark);
 }
-
 
